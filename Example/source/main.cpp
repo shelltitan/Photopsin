@@ -1,31 +1,9 @@
 #include <atomic>
-#include <algorithm>
 #include <span>
 #include "Window.hpp"
+#include "Render.hpp"
 
 static std::atomic_flag is_running{};
-
-static std::uint32_t *colour_buffer;
-static SDL_Texture * colour_buffer_texture;
-
-static void ClearColourBuffer(std::uint32_t colour = 0x00000000, std::uint16_t window_width = 0, std::uint16_t window_height = 0) {
-    std::fill_n(colour_buffer, static_cast<size_t>(window_width) * static_cast<size_t>(window_height), colour);
-}
-static void RenderColourBuffer(SDL_Renderer *renderer, SDL_Texture *texture, std::uint32_t *buffer, std::uint16_t width) {
-    SDL_UpdateTexture(texture, nullptr, buffer, static_cast<int>(width) * static_cast<int>(sizeof(std::uint32_t)));
-    SDL_RenderTexture(renderer, texture, nullptr, nullptr);
-}
-
-static void DrawGrid(std::span<std::uint32_t> buffer, std::uint16_t width, std::uint16_t height, std::uint8_t grid_pitch, std::uint32_t colour = 0xFFFFFFFF) {
-    for (std::uint16_t y = 0; y < height; ++y) {
-        for (std::uint16_t x = 0; x < width; ++x) {
-            if (x % grid_pitch == 0 || y % grid_pitch == 0) {
-                buffer[y * width + x] = colour;
-            }
-        }
-    }
-}
-
 
 auto main() -> int {
     Window window;
@@ -66,14 +44,14 @@ auto main() -> int {
         SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
         SDL_RenderClear(renderer);
 
+        // draw a grid
+#pragma clang unsafe_buffer_usage begin
+        DrawGrid(std::span<std::uint32_t>(colour_buffer, static_cast<size_t>(window_width) * static_cast<size_t>(window_height)), window_width, window_height, 10, 0xFFFFFFFF);
+#pragma clang unsafe_buffer_usage end
+
         RenderColourBuffer(renderer, colour_buffer_texture, colour_buffer, window_width);
         // clear our colour buffer to black
         ClearColourBuffer(0xFF000000, window_width, window_height);
-
-        // draw a grid
-#pragma clang unsafe_buffer_usage begin
-        DrawGrid(std::span<std::uint32_t>(colour_buffer, static_cast<size_t>(window_width) * static_cast<size_t>(window_height)), window_width, window_height, 100, 0xFFFFFFFF);
-#pragma clang unsafe_buffer_usage end
 
         SDL_RenderPresent(renderer);
     }

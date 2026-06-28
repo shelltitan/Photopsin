@@ -26,7 +26,7 @@ target_sources(
 target_link_libraries(
     ${NAME}
     PRIVATE
-    SDL3::SDL3-static
+    Photopsin
     spdlog::spdlog
 )
 
@@ -35,6 +35,5 @@ enable_clang_tidy_for_targets(${NAME})
 
 mark_imported_includes_as_system(
     ${NAME}
-    SDL3::SDL3-static
     spdlog::spdlog
 )
