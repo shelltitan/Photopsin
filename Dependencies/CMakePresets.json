@@ -23,6 +23,9 @@
 			"name": "windows",
 			"hidden": true,
 			"cmakeExecutable": "C:/Program Files/CMake/bin/cmake.exe",
+			"cacheVariables": {
+				"CMAKE_CXX_FLAGS_INIT": "-m64 -mavx2 -mavx -mbmi -mfma"
+			},
 			"condition": {
 				"type": "equals",
 				"lhs": "${hostSystemName}",
@@ -62,7 +65,7 @@
 			"hidden": true,
 			"generator": "Visual Studio 18 2026",
 			"cacheVariables": {
-				"CMAKE_CXX_FLAGS": "/Zc:__cplusplus /Zc:preprocessor /Zc:externConstexpr /Zc:throwingNew /permissive- /volatile:iso /EHsc"
+				"CMAKE_CXX_FLAGS": "/Zc:__cplusplus /Zc:preprocessor /Zc:externConstexpr /Zc:throwingNew /permissive- /volatile:iso /EHsc /Oi /arch:AVX2"
 			}
 		},
 		{
@@ -70,7 +73,7 @@
 			"hidden": true,
 			"toolchainFile": "${sourceParentDir}/CMake/Toolchains/x64-windows-clang-cl.cmake",
 			"cacheVariables": {
-				"CMAKE_CXX_FLAGS": "/Zc:__cplusplus /permissive- /volatile:iso /EHsc"
+				"CMAKE_CXX_FLAGS": "/Zc:__cplusplus /permissive- /volatile:iso /EHsc /Oi /arch:AVX2"
 			}
 		},
 		{
@@ -78,7 +81,7 @@
 			"hidden": true,
 			"toolchainFile": "${sourceParentDir}/CMake/Toolchains/x64-windows-msvc.cmake",
 			"cacheVariables": {
-				"CMAKE_CXX_FLAGS": "/Zc:__cplusplus /Zc:preprocessor /Zc:externConstexpr /Zc:throwingNew /permissive- /volatile:iso /EHsc"
+				"CMAKE_CXX_FLAGS": "/Zc:__cplusplus /Zc:preprocessor /Zc:externConstexpr /Zc:throwingNew /permissive- /volatile:iso /EHsc /Oi /arch:AVX2"
 			}
 		},
 		{
