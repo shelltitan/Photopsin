@@ -41,8 +41,6 @@ auto main() -> int {
         //Update()
         //Render()
         SDL_Renderer *renderer = window.GetRenderer();
-        SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
-        SDL_RenderClear(renderer);
 
         // draw a grid
 #pragma clang unsafe_buffer_usage begin
