@@ -24,6 +24,7 @@ set(NAME Photopsin)
 set(
     Header_Files
     "include/Render.hpp"
+    "include/Maths.hpp"
 )
 
 set(
