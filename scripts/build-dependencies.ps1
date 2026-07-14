@@ -1,20 +1,28 @@
 param(
     [switch]$Clean,
-    [Parameter(ValueFromRemainingArguments = $true)]
-    [string[]]$Preset
+    [Parameter(Position = 0, ValueFromRemainingArguments = $true)]
+    [string[]]$Preset,
+    [ValidateSet('Debug', 'Release')]
+    [string[]]$Configuration
 )
 
 $ErrorActionPreference = 'Stop'
 
 $depsDir = if ($env:DEPS_DIR) { $env:DEPS_DIR } else { 'Dependencies' }
-$repoRoot = git rev-parse --show-toplevel
+$appRoot = (Resolve-Path (Join-Path $PSScriptRoot '..')).Path
 
-if (-not $repoRoot) {
-    throw 'This script must be run from inside the Git repository.'
+if ([System.IO.Path]::IsPathRooted($depsDir)) {
+    $srcDir = $depsDir
+} else {
+    $srcDir = Join-Path $appRoot $depsDir
 }
 
-$repoRoot = $repoRoot.Trim()
-$srcDir = Join-Path $repoRoot $depsDir
+if (-not (Test-Path -LiteralPath $srcDir)) {
+    throw "Dependencies directory not found: $srcDir"
+}
+
+$srcDir = (Resolve-Path -LiteralPath $srcDir).Path
+$srcDirWithSeparator = $srcDir.TrimEnd('\', '/') + [System.IO.Path]::DirectorySeparatorChar
 
 function Get-ConfigurePresets {
     $output = & cmake -S $srcDir --list-presets
@@ -42,10 +50,11 @@ Usage:
   ./scripts/build-dependencies.ps1                 # configure+build ALL configure presets
   ./scripts/build-dependencies.ps1 <preset> [...]  # configure+build only the given presets
   ./scripts/build-dependencies.ps1 -Clean <preset> # delete build/install for the preset, then configure+build
+  ./scripts/build-dependencies.ps1 -Configuration Release <preset>
   ./scripts/build-dependencies.ps1 --list          # list available configure presets
 
 Env:
-  DEPS_DIR=Dependencies (default)  # set if your folder name differs
+  DEPS_DIR=Dependencies (default, relative to the application root)  # set if your folder name differs
 "@
 }
 
@@ -66,17 +75,29 @@ if ($presetsToRun.Count -eq 0) {
 }
 
 foreach ($presetName in $presetsToRun) {
+    $presetConfiguration = if ($presetName -match '(?i)-debug$') {
+        'Debug'
+    }
+    elseif ($presetName -match '(?i)-release$') {
+        'Release'
+    }
+
+    if ($Configuration.Count -gt 0 -and $presetConfiguration -and
+        ($Configuration.Count -ne 1 -or $Configuration[0] -ine $presetConfiguration)) {
+        throw "Preset '$presetName' is a $presetConfiguration single-config preset; requested configuration(s): $($Configuration -join ', ')."
+    }
+
     Write-Host "==> [$presetName] configure"
 
-    $buildDir = Join-Path $repoRoot "$depsDir/build/$presetName"
-    $installDir = Join-Path $repoRoot "$depsDir/install/$presetName"
+    $buildDir = Join-Path $srcDir "build/$presetName"
+    $installDir = Join-Path $srcDir "install/$presetName"
 
     if ($Clean) {
         foreach ($dir in @($buildDir, $installDir)) {
             if (Test-Path $dir) {
                 $resolved = (Resolve-Path $dir).Path
-                if (-not $resolved.StartsWith($repoRoot, [System.StringComparison]::OrdinalIgnoreCase)) {
-                    throw "Refusing to remove path outside repository root: $resolved"
+                if ($resolved -ne $srcDir -and -not $resolved.StartsWith($srcDirWithSeparator, [System.StringComparison]::OrdinalIgnoreCase)) {
+                    throw "Refusing to remove path outside dependencies root: $resolved"
                 }
 
                 Write-Host "==> [$presetName] clean $resolved"
@@ -92,9 +113,23 @@ foreach ($presetName in $presetsToRun) {
         exit $LASTEXITCODE
     }
 
-    Write-Host "==> [$presetName] build"
-    & cmake --build $buildDir
-    if ($LASTEXITCODE -ne 0) {
-        exit $LASTEXITCODE
+    $configurationsToBuild = if ($Configuration.Count -gt 0) {
+        $Configuration
+    }
+    elseif ($presetConfiguration) {
+        @($presetConfiguration)
+    }
+    else {
+        # Multi-config presets must install both runtime variants because the
+        # main project can be built in either configuration.
+        @('Debug', 'Release')
+    }
+
+    foreach ($config in $configurationsToBuild) {
+        Write-Host "==> [$presetName] build $config"
+        & cmake --build $buildDir --config $config
+        if ($LASTEXITCODE -ne 0) {
+            exit $LASTEXITCODE
+        }
     }
 }

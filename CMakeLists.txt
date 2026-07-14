@@ -57,5 +57,7 @@ mark_imported_includes_as_system(
     ${NAME}
     SDL3::SDL3-static
 )
+target_compile_features(${NAME} PUBLIC cxx_std_23)
+set_target_properties(${NAME} PROPERTIES CXX_EXTENSIONS OFF)
 
 add_subdirectory(Example)
