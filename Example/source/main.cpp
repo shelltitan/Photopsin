@@ -2,14 +2,11 @@
 #include <span>
 #include "Window.hpp"
 #include "Render.hpp"
+#include "Mesh.hpp"
 
 static std::atomic_flag is_running{};
 
 auto main() -> int {
-    Window window;
-    
-    std::uint16_t window_width;
-    std::uint16_t window_height;
 
     {
         int w, h;
@@ -24,9 +21,11 @@ auto main() -> int {
     colour_buffer_texture = SDL_CreateTexture(window.GetRenderer(), SDL_PIXELFORMAT_RGBA32, SDL_TEXTUREACCESS_STREAMING, window_width, window_height);
 
     is_running.test_and_set();
+    SDL_Event event{};
+
+    Mesh cube_mesh = CreateCubeMesh();
 
     while (is_running.test()) {
-        SDL_Event event;
         while (SDL_PollEvent(&event)) {
             if (event.type == SDL_EVENT_QUIT) {
                 is_running.clear();
@@ -42,10 +41,7 @@ auto main() -> int {
         //Render()
         SDL_Renderer *renderer = window.GetRenderer();
 
-        // draw a grid
-#pragma clang unsafe_buffer_usage begin
-        DrawGrid(std::span<std::uint32_t>(colour_buffer, static_cast<size_t>(window_width) * static_cast<size_t>(window_height)), window_width, window_height, 10, 0xFFFFFFFF);
-#pragma clang unsafe_buffer_usage end
+
 
         RenderColourBuffer(renderer, colour_buffer_texture, colour_buffer, window_width);
         // clear our colour buffer to black

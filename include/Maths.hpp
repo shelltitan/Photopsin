@@ -1,5 +1,7 @@
 #pragma once
 
+namespace Maths {
+
 struct Vector2f {
     float x;
     float y;
@@ -31,3 +33,5 @@ struct Vector4u {
     unsigned int z;
     unsigned int w;
 };
+
+}

@@ -2,12 +2,14 @@ set(NAME Example)
 
 set(
     Header_Files
+    "include/Application.hpp"
     "include/Window.hpp"
 )
 
 set(
     Source_Files
     "source/main.cpp"
+    "source/Application.cpp"
     "source/Window.cpp"
 )
 
