@@ -53,5 +53,5 @@ auto main() -> int {
     delete[] colour_buffer;
     SDL_DestroyTexture(colour_buffer_texture);
 
-    return 0;
+    return EXIT_SUCCESS;
 }
