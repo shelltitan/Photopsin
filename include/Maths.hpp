@@ -20,33 +20,25 @@ namespace Maths {
         float w;
     };
 
-    struct Vector4i {
-        int x;
-        int y;
-        int z;
-        int w;
+    struct alignas(16) Mat4x4f
+    {
+        float m[4][4];  // m[row][column]
     };
 
-    struct Vector4u {
-        unsigned int x;
-        unsigned int y;
-        unsigned int z;
-        unsigned int w;
+    static_assert(sizeof(Mat4x4f) == 64);
+    static_assert(alignof(Mat4x4f) >= 16);
+
+    struct alignas(16) Mat3x4f
+    {
+        float m[3][4];  // m[row][column]
     };
 
-    template <size_t width, size_t height>
-    struct Matrix {
-    public:
-        Matrix() = default;
+    static_assert(sizeof(Mat3x4f) == 48);
+    static_assert(alignof(Mat3x4f) >= 16);
 
-        float& At(size_t x, size_t y) { return m_Values[y * width + x]; }
-        auto operator*(const Matrix<height, width>& other) const { (void)other; }
-
-        Matrix Invert() const { }
-
-    private:
-        float m_Values[width * height];
-    };
+    // there is probably 2 ways that this has to be done
+    // one optimal for single point transform,
+    // one optimal for multiple point transform i.e. batch transform
 
     //[ s . . . ] [ x ]   [ sx ]
     //| . s . . | | y | = | sy |
