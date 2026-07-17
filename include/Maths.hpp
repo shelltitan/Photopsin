@@ -22,6 +22,28 @@ namespace Maths {
 
     struct alignas(16) Mat4x4f
     {
+    public:
+        Mat4x4f() = default;
+        Mat4x4f(const float* values) {
+            for (int i = 0; i < 4; ++i) {
+                for (int j = 0; j < 4; ++j) {
+                    m[i][j] = values[i * 4 + j];
+                }
+            }
+        }
+
+        float& operator()(int row, int col) {
+            return m[row][col];
+        }
+
+        const float& operator()(int row, int col) const {
+            return m[row][col];
+        }
+
+        Mat4x4f operator*(const Mat4x4f& other) const;
+        Vector4f operator*(const Vector4f& other) const;
+        Vector3f operator*(const Vector3f& other) const;
+    private:
         float m[4][4];  // m[row][column]
     };
 
@@ -30,6 +52,27 @@ namespace Maths {
 
     struct alignas(16) Mat3x4f
     {
+    public:
+        Mat3x4f() = default;
+        Mat3x4f(const float* values) {
+            for (int i = 0; i < 3; ++i) {
+                for (int j = 0; j < 4; ++j) {
+                    m[i][j] = values[i * 4 + j];
+                }
+            }
+        }
+
+        float& operator()(int row, int col) {
+            return m[row][col];
+        }
+
+        const float& operator()(int row, int col) const {
+            return m[row][col];
+        }
+
+        Vector4f operator*(const Vector4f& other) const;
+        Vector3f operator*(const Vector3f& other) const;
+    private:
         float m[3][4];  // m[row][column]
     };
 

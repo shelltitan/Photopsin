@@ -29,6 +29,7 @@ set(
 
 set(
     Source_Files
+    "source/Maths.cpp"
     "source/Render.cpp"
 )
 
