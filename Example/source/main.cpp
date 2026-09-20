@@ -16,9 +16,10 @@ auto main() -> int {
     }
     // TODO check if this throws
     colour_buffer = new std::uint32_t[static_cast<size_t>(window_width) * static_cast<size_t>(window_height)];
-    
+
     // Create a texture for the colour buffer
-    colour_buffer_texture = SDL_CreateTexture(window.GetRenderer(), SDL_PIXELFORMAT_RGBA32, SDL_TEXTUREACCESS_STREAMING, window_width, window_height);
+    colour_buffer_texture = SDL_CreateTexture(window.GetRenderer(), SDL_PIXELFORMAT_RGBA32, SDL_TEXTUREACCESS_STREAMING,
+                                              window_width, window_height);
 
     is_running.test_and_set();
     SDL_Event event{};
@@ -29,19 +30,16 @@ auto main() -> int {
         while (SDL_PollEvent(&event)) {
             if (event.type == SDL_EVENT_QUIT) {
                 is_running.clear();
-            }
-            else if (event.type == SDL_EVENT_KEY_DOWN) {
+            } else if (event.type == SDL_EVENT_KEY_DOWN) {
                 if (event.key.key == SDLK_ESCAPE) {
                     is_running.clear();
                 }
             }
         }
 
-        //Update()
-        //Render()
+        // Update()
+        // Render()
         SDL_Renderer *renderer = window.GetRenderer();
-
-
 
         RenderColourBuffer(renderer, colour_buffer_texture, colour_buffer, window_width);
         // clear our colour buffer to black

@@ -4,14 +4,15 @@
 #include <string_view>
 
 class Window {
-public:
+  public:
     Window(std::string_view title = "Software renderer app");
 
     ~Window();
 
     SDL_Renderer *GetRenderer() const { return renderer; }
     SDL_Window *GetWindow() const { return window; }
-private:
+
+  private:
     SDL_Window *window;
     SDL_Renderer *renderer;
 };
