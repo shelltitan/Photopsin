@@ -24,7 +24,7 @@ struct alignas(16) Vector4f {
 struct alignas(16) Mat4x4f {
   public:
     Mat4x4f() = default;
-    Mat4x4f(const std::span<float, 16> values) {
+    Mat4x4f(const std::span<float, 16> values) noexcept {
         for (std::size_t i = 0; i < 4; ++i) {
             for (std::size_t j = 0; j < 4; ++j) {
                 matrix[i][j] = values[i * 4 + j];
@@ -32,13 +32,13 @@ struct alignas(16) Mat4x4f {
         }
     }
 
-    float &operator()(int row, int col) { return matrix[row][col]; }
+    float &operator()(int row, int col) noexcept { return matrix[row][col]; }
 
-    const float &operator()(int row, int col) const { return matrix[row][col]; }
+    const float &operator()(int row, int col) const noexcept { return matrix[row][col]; }
 
-    Mat4x4f operator*(const Mat4x4f &other) const;
-    Vector4f operator*(const Vector4f &other) const;
-    Vector3f operator*(const Vector3f &other) const;
+    Mat4x4f operator*(const Mat4x4f &other) const noexcept;
+    Vector4f operator*(const Vector4f &other) const noexcept;
+    Vector3f operator*(const Vector3f &other) const noexcept;
 
   private:
     float matrix[4][4]; // matrix[row][column]
@@ -50,7 +50,7 @@ static_assert(alignof(Mat4x4f) >= 16);
 struct alignas(16) Mat3x4f {
   public:
     Mat3x4f() = default;
-    Mat3x4f(const float *values) {
+    Mat3x4f(const float *values) noexcept {
         for (int i = 0; i < 3; ++i) {
             for (int j = 0; j < 4; ++j) {
                 m[i][j] = values[i * 4 + j];
@@ -58,12 +58,12 @@ struct alignas(16) Mat3x4f {
         }
     }
 
-    float &operator()(int row, int col) { return m[row][col]; }
+    float &operator()(int row, int col) noexcept { return m[row][col]; }
 
-    const float &operator()(int row, int col) const { return m[row][col]; }
+    const float &operator()(int row, int col) const noexcept { return m[row][col]; }
 
-    Vector4f operator*(const Vector4f &other) const;
-    Vector3f operator*(const Vector3f &other) const;
+    Vector4f operator*(const Vector4f &other) const noexcept;
+    Vector3f operator*(const Vector3f &other) const noexcept;
 
   private:
     float m[3][4]; // m[row][column]
